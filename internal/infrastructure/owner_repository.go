@@ -1,4 +1,4 @@
-package internal
+package infrastructure
 
 import (
 	"PetProject/pkg"
@@ -25,25 +25,25 @@ func (OwnerRepository *OwnerRepository) SaveOwner(owner *Owner) {
 			insert into owners 
 		    (id, name, birth_date, pet_id)
 			values ($1, $2, $3, $4))`,
-		owner.id, owner.name, owner.birthDate, owner.petId)
+		owner.Id, owner.Name, owner.BirthDate, owner.PetId)
 
-	for _, id := range owner.petId {
+	for _, id := range owner.PetId {
 		OwnerRepository.repository.Db.QueryRow(`
 			insert into pet_owners 
     		(pet_id, owner_id) 
 			values ($1, $2)`,
-			id, owner.id)
+			id, owner.Id)
 	}
 }
 
-func (OwnerRepository *OwnerRepository) FindOwnerById(OwnerId string) (owner *Owner) {
+func (OwnerRepository *OwnerRepository) FindOwnerById(OwnerId int) (owner *Owner) {
 	row := OwnerRepository.repository.Db.QueryRow(`
 		    (id, name, birth_date, pet_id)
 		    from owners
 			where id = $1`,
 		OwnerId)
 	owner = &Owner{}
-	err := row.Scan(&owner.id, &owner.name, &owner.birthDate, &owner.petId)
+	err := row.Scan(&owner.Id, &owner.Name, &owner.BirthDate, &owner.PetId)
 	if err != nil {
 		println(err.Error())
 	}
@@ -63,11 +63,15 @@ func (OwnerRepository *OwnerRepository) FindAllOwner() (Owners []Owner) {
 	Owners = []Owner{}
 	for rows.Next() {
 		owner := &Owner{}
-		err := rows.Scan(&owner.id, &owner.name, &owner.birthDate, &owner.petId)
+		err := rows.Scan(&owner.Id, &owner.Name, &owner.BirthDate, &owner.PetId)
 		if err != nil {
 			println(err.Error())
 		}
 		Owners = append(Owners, *owner)
 	}
 	return Owners
+}
+
+func (OwnerRepository *OwnerRepository) Delete(ownerId int) {
+	OwnerRepository.repository.Db.Exec(`delete from owners where id = $1`, ownerId)
 }
