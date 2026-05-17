@@ -1,4 +1,4 @@
-package internal
+package infrastructure
 
 import (
 	"PetProject/pkg"
@@ -13,7 +13,7 @@ func NewPetRepository(repository *pkg.Repository) *PetRepository {
 }
 
 func (petRepository *PetRepository) SavePet(pet *Pet) {
-	row := petRepository.repository.Db.QueryRow(`select (id) from pets`)
+	row := petRepository.repository.Db.QueryRow(`select (pet.id) from pets`)
 	var id int
 	err := row.Scan(id)
 	if err != nil {
@@ -26,31 +26,31 @@ func (petRepository *PetRepository) SavePet(pet *Pet) {
 			insert into pets 
 		    (id, name, birth_date, breed, color, owner_id)
 			values ($1, $2, $3, $4, $5))`,
-		pet.id, pet.name, pet.birthDate, pet.breed, pet.color)
+		pet.Id, pet.Name, pet.BirthDate, pet.Breed, pet.Color)
 
 	petRepository.repository.Db.QueryRow(`
 			insert into pet_owners 
     		(pet_id, owner_id) 
 			values ($1, $2)`,
-		pet.id, pet.ownerId)
+		pet.Id, pet.OwnerId)
 
-	for _, id := range pet.friendIds {
+	for _, id := range pet.FriendIds {
 		petRepository.repository.Db.QueryRow(`
 			insert into pet_friends 
     		(pet_id, friend_id) 
 			values ($1, $2)`,
-			pet.id, id)
+			pet.Id, id)
 	}
 }
 
-func (petRepository *PetRepository) FindPetById(petId string) (pet *Pet) {
+func (petRepository *PetRepository) FindPetById(petId int) (pet *Pet) {
 	row := petRepository.repository.Db.QueryRow(`
 			select (id, name, birth_date, breed, color, owner_id) 
 			from pets
 			where id = $1`,
 		petId)
 	pet = &Pet{}
-	err := row.Scan(&pet.id, &pet.name, &pet.birthDate, &pet.breed, &pet.color, &pet.ownerId)
+	err := row.Scan(&pet.Id, &pet.Name, &pet.BirthDate, &pet.Breed, &pet.Color, &pet.OwnerId)
 	if err != nil {
 		println(err.Error())
 	}
@@ -70,11 +70,15 @@ func (petRepository *PetRepository) FindAllPet() (pets []Pet) {
 	pets = []Pet{}
 	for rows.Next() {
 		pet := &Pet{}
-		err := rows.Scan(&pet.id, &pet.name, &pet.birthDate, &pet.breed, &pet.color, &pet.ownerId)
+		err := rows.Scan(&pet.Id, &pet.Name, &pet.BirthDate, &pet.Breed, &pet.Color, &pet.OwnerId)
 		if err != nil {
 			println(err.Error())
 		}
 		pets = append(pets, *pet)
 	}
 	return pets
+}
+
+func (petRepository *PetRepository) Delete(id int) {
+	petRepository.repository.Db.Exec(`delete from pets where id = $1`, id)
 }

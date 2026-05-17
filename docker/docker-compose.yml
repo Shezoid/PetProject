@@ -9,3 +9,11 @@ services:
       - "5432:5432"
     volumes:
       - pet_data:/var/lib/postgresql
+
+  immigrate:
+    image: liquibase/liquibase:4.23
+    working_dir: /liquibase/changelog
+    volumes:
+      - ./../changelog:/liquibase/changelog
+    command: >
+      liquibase --changeLogFile=0.0.1_create_schema.xml --url=jdbc:postgresql://localhost:5432/pet_db --username=admin --password=admin  update
