@@ -5,8 +5,8 @@ import (
 )
 
 type Owner struct {
-	Id        int
+	ID        int
 	Name      string
 	BirthDate time.Time
-	PetId     []int
+	PetIDs    []int
 }

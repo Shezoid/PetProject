@@ -5,11 +5,11 @@ import (
 )
 
 type Pet struct {
-	Id        int
+	ID        int
 	Name      string
 	BirthDate time.Time
 	Breed     string
 	Color     string
-	OwnerId   int
-	FriendIds []int
+	OwnerID   int
+	FriendIDs []int
 }

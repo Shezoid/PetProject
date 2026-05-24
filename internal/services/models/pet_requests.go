@@ -1,40 +1,51 @@
 package models
 
 import (
+	"errors"
 	"time"
 )
 
 type CreatePetRequest struct {
 	Name      string    `json:"name"`
-	BirthDate time.Time `json:"birthDate"`
+	BirthDate time.Time `json:"birth_date"`
 	Breed     string    `json:"breed"`
 	Color     string    `json:"color"`
-	OwnerId   int       `json:"ownerId"`
-	FriendIds []int     `json:"petId,omitempty"`
+	OwnerID   int       `json:"owner_id"`
+	FriendIDs []int     `json:"friend_ids,omitempty"`
 }
 
 type UpdatePetRequest struct {
-	Id        int       `json:"id"`
+	ID        int       `json:"id"`
 	Name      string    `json:"name"`
 	BirthDate time.Time `json:"birthDate"`
 	Breed     string    `json:"breed"`
 	Color     string    `json:"color"`
-	OwnerId   int       `json:"ownerId"`
-	FriendIds []int     `json:"petId,omitempty"`
+	OwnerID   int       `json:"ownerId"`
+	FriendIDs []int     `json:"friendIds,omitempty"`
 }
 
-func (request *CreatePetRequest) Validate() bool {
-	return request.Color == "" ||
-		request.Name == "" ||
-		request.Breed == "" ||
-		request.BirthDate.IsZero() ||
-		request.OwnerId == 0
+func (r *CreatePetRequest) Validate() error {
+	if r.Name == "" {
+		return errors.New("name is required")
+	}
+	if r.Color == "" {
+		return errors.New("color is required")
+	}
+	if r.BirthDate.IsZero() {
+		return errors.New("birthDate is required")
+	}
+	return nil
 }
 
-func (request *UpdatePetRequest) Validate() bool {
-	return request.Color == "" ||
-		request.Name == "" ||
-		request.Breed == "" ||
-		request.BirthDate.IsZero() ||
-		request.OwnerId == 0
+func (r *UpdatePetRequest) Validate() error {
+	if r.Name == "" {
+		return errors.New("name is required")
+	}
+	if r.Color == "" {
+		return errors.New("color is required")
+	}
+	if r.BirthDate.IsZero() {
+		return errors.New("birthDate is required")
+	}
+	return nil
 }

@@ -13,12 +13,6 @@ CREATE TABLE IF NOT EXISTS pets (
     owner_id   INTEGER REFERENCES owners(id) ON DELETE SET NULL
 );
 
-CREATE TABLE IF NOT EXISTS owner_pets (
-    owner_id INTEGER REFERENCES owners(id) ON DELETE CASCADE,
-    pet_id   INTEGER REFERENCES pets(id) ON DELETE CASCADE,
-    PRIMARY KEY (owner_id, pet_id)
-);
-
 CREATE TABLE IF NOT EXISTS pet_friends (
     pet_id    INTEGER REFERENCES pets(id) ON DELETE CASCADE,
     friend_id INTEGER REFERENCES pets(id) ON DELETE CASCADE,
